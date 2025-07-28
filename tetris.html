@@ -5,6 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tetris Game</title>
     <link rel="stylesheet" href="index.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .game-container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            grid-template-rows: repeat(20, 30px);
+            gap: 1px;
+            background-color: #ddd;
+            margin: 20px auto;
+            border: 2px solid #333;
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            background-color: #fff;
+        }
+
+        .cell.filled {
+            background-color: #333;
+        }
+
+        .game-info {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <div class="game-container">
@@ -16,6 +77,74 @@
             <button id="start-button">Start Game</button>
         </div>
     </div>
-    <script src="index.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const board = document.getElementById('board');
+            const scoreDisplay = document.getElementById('score');
+            const levelDisplay = document.getElementById('level');
+            const startButton = document.getElementById('start-button');
+
+            const ROWS = 20;
+            const COLS = 10;
+            const CELL_SIZE = 30;
+            let score = 0;
+            let level = 1;
+            let gameInterval;
+            let isGameRunning = false;
+
+            // Initialize the board
+            function createBoard() {
+                board.innerHTML = '';
+                for (let row = 0; row < ROWS; row++) {
+                    for (let col = 0; col < COLS; col++) {
+                        const cell = document.createElement('div');
+                        cell.classList.add('cell');
+                        cell.id = `${row}-${col}`;
+                        board.appendChild(cell);
+                    }
+                }
+            }
+
+            // Start the game
+            function startGame() {
+                if (isGameRunning) return;
+                isGameRunning = true;
+                score = 0;
+                level = 1;
+                scoreDisplay.textContent = score;
+                levelDisplay.textContent = level;
+                createBoard();
+                gameInterval = setInterval(updateGame, 1000);
+            }
+
+            // Update the game state
+            function updateGame() {
+                // Placeholder for game logic
+                console.log('Game is running...');
+            }
+
+            // Event listeners
+            startButton.addEventListener('click', startGame);
+
+            // Keyboard controls
+            document.addEventListener('keydown', (e) => {
+                if (!isGameRunning) return;
+                switch (e.key) {
+                    case 'ArrowLeft':
+                        console.log('Move left');
+                        break;
+                    case 'ArrowRight':
+                        console.log('Move right');
+                        break;
+                    case 'ArrowDown':
+                        console.log('Move down');
+                        break;
+                    case 'ArrowUp':
+                        console.log('Rotate');
+                        break;
+                }
+            });
+        });
+    </script>
 </body>
 </html>
