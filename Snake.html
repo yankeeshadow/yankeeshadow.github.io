@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Snake Game</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+    #game-container {
+      width: 1000px;
+      height: 500px;
+      border: 2px solid #fff;
+      position: relative;
+      background-color: #000;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 20px;
+      z-index: 10;
+    }
+    #game-over {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 40px;
+      display: none;
+      z-index: 10;
+    }
+    #restart-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="score">Score: 0</div>
+    <div id="game-over">
+      Game Over<br/>
+      <button id="restart-btn">Restart</button>
+    </div>
+    <canvas id="gameCanvas" width="1000" height="500"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score');
+    const gameOverDisplay = document.getElementById('game-over');
+    const restartBtn = document.getElementById('restart-btn');
+
+    const gridSize = 20;
+    const tileCount = { x: canvas.width / gridSize, y: canvas.height / gridSize };
+
+    let snake = [{ x: 10, y: 10 }];
+    let direction = { x: 0, y: 0 };
+    let food = { x: 5, y: 5 };
+    let score = 0;
+    let gameInterval;
+    let gameOver = false;
+
+    function drawTile(x, y, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x * gridSize, y * gridSize, gridSize - 2, gridSize - 2);
+    }
+
+    function placeFood() {
+      food.x = Math.floor(Math.random() * tileCount.x);
+      food.y = Math.floor(Math.random() * tileCount.y);
+    }
+
+    function draw() {
+      if (gameOver) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Move snake
+      const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+      // Check wall collision
+      if (head.x < 0 || head.x >= tileCount.x || head.y < 0 || head.y >= tileCount.y) {
+        endGame();
+        return;
+      }
+
+      // Check self collision
+      for (let segment of snake) {
+        if (segment.x === head.x && segment.y === head.y) {
+          endGame();
+          return;
+        }
+      }
+
+      snake.unshift(head);
+
+      // Check food collision
+      if (head.x === food.x && head.y === food.y) {
+        score += 10;
+        scoreDisplay.textContent = 'Score: ' + score;
+        placeFood();
+      } else {
+        snake.pop();
+      }
+
+      // Draw food
+      drawTile(food.x, food.y, 'red');
+
+      // Draw snake
+      for (let i = 0; i < snake.length; i++) {
+        drawTile(snake[i].x, snake[i].y, i === 0 ? 'lime' : 'green');
+      }
+    }
+
+    function endGame() {
+      clearInterval(gameInterval);
+      gameOver = true;
+      gameOverDisplay.style.display = 'block';
+      restartBtn.style.display = 'inline-block';
+    }
+
+    function startGame() {
+      snake = [{ x: 10, y: 10 }];
+      direction = { x: 0, y: 0 };
+      score = 0;
+      scoreDisplay.textContent = 'Score: 0';
+      gameOver = false;
+      gameOverDisplay.style.display = 'none';
+      restartBtn.style.display = 'none';
+      placeFood();
+      gameInterval = setInterval(draw, 100);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowUp':
+          if (direction.y === 0) direction = { x: 0, y: -1 };
+          break;
+        case 'ArrowDown':
+          if (direction.y === 0) direction = { x: 0, y: 1 };
+          break;
+        case 'ArrowLeft':
+          if (direction.x === 0) direction = { x: -1, y: 0 };
+          break;
+        case 'ArrowRight':
+          if (direction.x === 0) direction = { x: 1, y: 0 };
+          break;
+      }
+    });
+
+    restartBtn.addEventListener('click', () => {
+      startGame();
+    });
+
+    startGame();
+  </script>
+</body>
+</html>
