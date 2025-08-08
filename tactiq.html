@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tactiq</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #game-container {
+            text-align: center;
+        }
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(4, 100px);
+            gap: 10px;
+            margin: 20px auto;
+        }
+        .tile {
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            border: 2px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .tile:hover {
+            background-color: #e0e0e0;
+        }
+        #score {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+        #start-button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #start-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-board"></div>
+        <div id="score">Score: 0</div>
+        <button id="start-button">Start Game</button>
+    </div>
+
+    <script>
+        const gameBoard = document.getElementById('game-board');
+        const scoreElement = document.getElementById('score');
+        const startButton = document.getElementById('start-button');
+
+        let score = 0;
+        let tiles = [];
+        let selectedTile = null;
+
+        function initializeBoard() {
+            gameBoard.innerHTML = '';
+            tiles = [];
+            score = 0;
+            scoreElement.textContent = `Score: ${score}`;
+
+            // Create 16 tiles with random values (1-4)
+            for (let i = 0; i < 16; i++) {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.textContent = Math.floor(Math.random() * 4) + 1;
+                tile.addEventListener('click', () => selectTile(tile));
+                gameBoard.appendChild(tile);
+                tiles.push(tile);
+            }
+        }
+
+        function selectTile(tile) {
+            if (!selectedTile) {
+                selectedTile = tile;
+                tile.style.backgroundColor = '#a0a0a0';
+            } else if (selectedTile === tile) {
+                selectedTile.style.backgroundColor = '#fff';
+                selectedTile = null;
+            } else {
+                // Swap values
+                const temp = selectedTile.textContent;
+                selectedTile.textContent = tile.textContent;
+                tile.textContent = temp;
+
+                // Check for matches
+                checkMatches();
+
+                // Reset selection
+                selectedTile.style.backgroundColor = '#fff';
+                selectedTile = null;
+            }
+        }
+
+        function checkMatches() {
+            // Check rows for matches
+            for (let row = 0; row < 4; row++) {
+                const rowTiles = tiles.slice(row * 4, row * 4 + 4);
+                if (rowTiles.every(tile => tile.textContent === rowTiles[0].textContent)) {
+                    updateScore(10);
+                    rowTiles.forEach(tile => {
+                        tile.textContent = Math.floor(Math.random() * 4) + 1;
+                    });
+                }
+            }
+
+            // Check columns for matches
+            for (let col = 0; col < 4; col++) {
+                const colTiles = [];
+                for (let row = 0; row < 4; row++) {
+                    colTiles.push(tiles[row * 4 + col]);
+                }
+                if (colTiles.every(tile => tile.textContent === colTiles[0].textContent)) {
+                    updateScore(10);
+                    colTiles.forEach(tile => {
+                        tile.textContent = Math.floor(Math.random() * 4) + 1;
+                    });
+                }
+            }
+        }
+
+        function updateScore(points) {
+            score += points;
+            scoreElement.textContent = `Score: ${score}`;
+        }
+
+        startButton.addEventListener('click', initializeBoard);
+
+        // Initialize the board on load
+        initializeBoard();
+    </script>
+</body>
+</html>
